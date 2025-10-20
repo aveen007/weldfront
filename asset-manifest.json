@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/weld-app/static/css/main.ccf36b70.css",
+    "main.js": "/weld-app/static/js/main.7a27256c.js",
+    "index.html": "/weld-app/index.html",
+    "main.ccf36b70.css.map": "/weld-app/static/css/main.ccf36b70.css.map",
+    "main.7a27256c.js.map": "/weld-app/static/js/main.7a27256c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ccf36b70.css",
+    "static/js/main.7a27256c.js"
+  ]
+}
