@@ -72,7 +72,22 @@ export default function MyDropzone() {
       reader.readAsDataURL(allFiles[0]);
     }
   };
-
+const handleStartOver = () => {
+  setDataURL(null);
+  setUploadedURL(null);
+  setUploadedPaths([]);
+  setIsEditing(false);
+  setIsProcessed(false);
+  setShowLengthPopup(false);
+  setAnalysisResults(null);
+  setCsvData(null);
+  setBulkResults([]);
+  setCurrentBulkIndex(0);
+  setAllFiles([]);
+  setCurrentFileIndex(0);
+  setProcessingMode(null);
+  setReferencePoints([{ x: 0, y: 0 }, { x: 0, y: 0 }]);
+};
   const goToNextFile = () => {
     const nextIndex = currentFileIndex + 1;
     if (nextIndex < allFiles.length) {
@@ -1127,6 +1142,20 @@ const logNavigation = (direction, newIndex) => {
                 >
                   Download CSV
                 </button>
+                  <button
+                        onClick={handleStartOver}
+                        className="start-over-btn"
+                        style={{
+                          background: '#6c757d',
+                          color: 'white',
+                          padding: '10px 20px',
+                          border: 'none',
+                          borderRadius: '5px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Start New Measurement
+                      </button>
               </div>
             </th>
           </tr>
