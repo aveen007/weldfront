@@ -894,7 +894,7 @@ const logNavigation = (direction, newIndex) => {
                           setShowScaleLine={setShowScaleLine}
                         />
                       )}
-      <div className="zone">
+
         {allFiles.length > 1 && processingMode === "one-by-one" && (
           <div className="file-counter">
             File {currentFileIndex + 1} of {allFiles.length}
@@ -902,152 +902,159 @@ const logNavigation = (direction, newIndex) => {
         )}
 
         {dataURL ? (
-          <div className="selected">
+          <div className="image-with-controls">
+            {/* Image inside the dashed border */}
+            <div className="zone">
+             <div className="selected">
 
-{showMask && analysisResults?.images[0]?.linesData?.mask_contours && (
-  <canvas
-    ref={maskCanvasRef}
-    width={imageDimensions.width}
-    height={imageDimensions.height}
-    style={{
-      position: "absolute",
+                        {showMask && analysisResults?.images[0]?.linesData?.mask_contours && (
+                          <canvas
+                            ref={maskCanvasRef}
+                            width={imageDimensions.width}
+                            height={imageDimensions.height}
+                            style={{
+                              position: "absolute",
 
-      width: "100%",
-      height: "auto",
-      pointerEvents: "none",
-      zIndex: 2
-    }}
-  />
-)}
+                              width: "100%",
+                              height: "auto",
+                              pointerEvents: "none",
+                              zIndex: 2
+                            }}
+                          />
+                        )}
 
-            {isProcessed && analysisResults ? (
+                        {isProcessed && analysisResults ? (
 
-           <>
-   <img
-      src={dataURL}
-      alt="debug"
-      style={{
-        maxWidth: "100%",
-        height: "auto",
-        border: "5px solid red", // helps see it
-        backgroundColor: "yellow",
-      }}
-      onLoad={() => console.log("Image loaded:", dataURL)}
-      onError={(e) => console.error("Image failed to load", dataURL, e)}
-      style={{ display: showOverlay ? 'none' : 'block', maxWidth: '100%' }}
-    />
-               {showOverlay && (
-                 <ImageWithOverlay
-                   imageUrl={dataURL}
-                   linesData={analysisResults.images[0].linesData}
-                   scaleParams={analysisResults.images[0].scaleParams}
-                    style={{
-                       position: 'absolute',
-                       top: 0,
-                       left: 0,
-                       width: '100%',
-                       height: '100%'
-                     }}
-                 />
-               )}
+                               <>
+                               <img
+                                  src={dataURL}
+                                  alt="debug"
+                                  style={{
+                                    maxWidth: "100%",
+                                    height: "auto",
+                                    border: "5px solid red", // helps see it
+                                    backgroundColor: "yellow",
+                                  }}
+                                  onLoad={() => console.log("Image loaded:", dataURL)}
+                                  onError={(e) => console.error("Image failed to load", dataURL, e)}
+                                  style={{ display: showOverlay ? 'none' : 'block', maxWidth: '100%' }}
+                                />
+                               {showOverlay && (
+                                 <ImageWithOverlay
+                                   imageUrl={dataURL}
+                                   linesData={analysisResults.images[0].linesData}
+                                   scaleParams={analysisResults.images[0].scaleParams}
+                                    style={{
+                                       position: 'absolute',
+                                       top: 0,
+                                       left: 0,
+                                       width: '100%',
+                                       height: '100%'
+                                     }}
+                                 />
+                               )}
 
-               {showScaleLine && (
-                 <canvas
-                   ref={canvasRef}
-                   width={imageDimensions.width}
-                   height={imageDimensions.height}
-                   style={{
-                       position: "absolute",
-                       top: 0,
-                       left: 0,
-                       width: "100%",
-                       height: "100%",
-                     pointerEvents: "none", // prevent interfering with interactions
-                     zIndex: 2
-                   }}
-                 />
-               )}
-             </>
+                               {showScaleLine && (
+                                 <canvas
+                                   ref={canvasRef}
+                                   width={imageDimensions.width}
+                                   height={imageDimensions.height}
+                                   style={{
+                                       position: "absolute",
+                                       top: 0,
+                                       left: 0,
+                                       width: "100%",
+                                       height: "100%",
+                                     pointerEvents: "none", // prevent interfering with interactions
+                                     zIndex: 2
+                                   }}
+                                 />
+                               )}
+                             </>
 
-            ) : (
-              <div style={{ position: "relative" }}>
-                <img
-                  ref={imageRef}
-                  src={dataURL}
-                  style={{ maxWidth: "100%", height: "auto" }}
-                  alt="Uploaded"
-                />
-                {uploadedURL && imageDimensions.width > 0 &&(
-                  <canvas
-                    ref={canvasRef}
-                    width={imageDimensions.width}
-                    height={imageDimensions.height}
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      cursor: isEditing ? "pointer" : "default",
-                    }}
-                    onMouseDown={handleCanvasMouseDown}
-                    onMouseMove={handleCanvasMouseMove}
-                    onMouseUp={handleCanvasMouseUp}
-                    onMouseLeave={handleCanvasMouseUp}
-                  />
-                )}
-              </div>
-            )}
+                             ) : (
+                              <div style={{ position: "relative" }}>
+                                <img
+                                  ref={imageRef}
+                                  src={dataURL}
+                                  style={{ maxWidth: "100%", height: "auto" }}
+                                  alt="Uploaded"
+                                />
+                                {uploadedURL && imageDimensions.width > 0 &&(
+                                  <canvas
+                                    ref={canvasRef}
+                                    width={imageDimensions.width}
+                                    height={imageDimensions.height}
+                                    style={{
+                                      position: "absolute",
+                                      top: 0,
+                                      left: 0,
+                                      width: "100%",
+                                      height: "100%",
+                                      cursor: isEditing ? "pointer" : "default",
+                                    }}
+                                    onMouseDown={handleCanvasMouseDown}
+                                    onMouseMove={handleCanvasMouseMove}
+                                    onMouseUp={handleCanvasMouseUp}
+                                    onMouseLeave={handleCanvasMouseUp}
+                                  />
+                                )}
+                              </div>
+                        )}
+                        </div>
+                        </div>
 
-            {!isProcessed && (
 
-              <div className="actions">
-                {uploadedURL ? (
-                  <>
-                    {!isEditing ? (
-                      <>
-                        <button onClick={() => setIsEditing(true)} className="edit-btn">
-                          Edit Line
-                        </button>
-                        <button onClick={handleAcceptLine} className="accept-btn">
-                          Accept
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => setIsEditing(false)}
-                          className="cancel-btn"
-                        >
-                          Cancel Edit
-                        </button>
-                        <button onClick={handleAcceptLine} className="accept-btn">
-                          Save
-                        </button>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <button onClick={uploadImage} className="upload-btn">
-                    Upload
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    setDataURL(null);
-                    setUploadedURL(null);
-                    setIsEditing(false);
-                    setIsProcessed(false);
-                    setAnalysisResults(null);
-                  }}
-                  className="cancel-btn"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
-          </div>
+          {!isProcessed && (
+
+                        <div className="actions" style={{ marginTop: '20px', textAlign: 'center'}} >
+                          {uploadedURL ? (
+                            <>
+                              {!isEditing ? (
+                                <>
+                                  <button onClick={() => setIsEditing(true)} className="edit-btn">
+                                    Edit Line
+                                  </button>
+                                  <button onClick={handleAcceptLine} className="accept-btn">
+                                    Accept
+                                  </button>
+                                </>
+                                       ) : (
+                                <>
+                                  <button
+                                    onClick={() => setIsEditing(false)}
+                                    className="cancel-btn"
+                                  >
+                                    Cancel Edit
+                                  </button>
+                                  <button onClick={handleAcceptLine} className="accept-btn">
+                                    Save
+                                  </button>
+                                </>
+                              )}
+                            </>
+                          ) : (
+                          <button onClick={uploadImage} className="upload-btn">
+                          Upload
+                          </button>
+                          )}
+                          <button
+                            onClick={() => {
+                              setDataURL(null);
+                              setUploadedURL(null);
+                              setIsEditing(false);
+                              setIsProcessed(false);
+                              setAnalysisResults(null);
+                            }}
+                            className="cancel-btn"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                      </div>
         ) : (
+            <div className="zone">
           <div className="drop-zone" {...getRootProps()}>
             <input {...getInputProps()} />
             {isDragActive ? (
@@ -1066,8 +1073,9 @@ const logNavigation = (direction, newIndex) => {
               <div className="drag-files">Drop your files here or click to browse</div>
             )}
           </div>
+          </div>
         )}
-      </div>
+
 
       {showProcessChoice && (
         <div className="popup-overlay">
