@@ -87,29 +87,33 @@ const handleStartOver = () => {
   setCurrentFileIndex(0);
   setProcessingMode(null);
   setReferencePoints([{ x: 0, y: 0 }, { x: 0, y: 0 }]);
+  setShowMask(false);
+  setShowOverlay(true);
+  setShowScaleLine(true);
 };
   const goToNextFile = () => {
     const nextIndex = currentFileIndex + 1;
     if (nextIndex < allFiles.length) {
+      // Clear previous results before moving to next file
+      setUploadedURL(null);
+      setIsEditing(false);
+      setIsProcessed(false);
+      setShowLengthPopup(false);
+      setAnalysisResults(null);
+      setCsvData(null);
+      setReferencePoints([{ x: 0, y: 0 }, { x: 0, y: 0 }]);
+
       setCurrentFileIndex(nextIndex);
       const reader = new FileReader();
       reader.onload = () => {
         setDataURL(reader.result);
       };
       reader.readAsDataURL(allFiles[nextIndex]);
-
-      setUploadedURL(null);
-
-      setIsEditing(false);
-      setIsProcessed(false);
-      setShowLengthPopup(false);
-      setReferencePoints([
-        { x: 0, y: 0 },
-        { x: 0, y: 0 },
-      ]);
     } else {
+      // If no more files, clear everything
       setAllFiles([]);
       setCurrentFileIndex(0);
+      setProcessingMode(null);
     }
   };
  useEffect(() => {
@@ -466,13 +470,21 @@ const handleSaveLength = async () => {
        console.error("Error in bulk processing:", error);
      }
    } else {
-      // REPLACE THIS PART with Gradio predict_3 call
+
       const baseURL = "https://aveen007-laserweld.hf.space";
       const apiEndpoint = "/call/predict_3";
 
+      // --- For one-by-one mode, use existing uploaded path ---
+      let uploadedPath = null;
+
+      if (processingMode === "one-by-one" && uploadedPaths[currentFileIndex]) {
+        // Use existing uploaded path for current image
+        uploadedPath = uploadedPaths[currentFileIndex];
+        console.log("Using existing uploaded path for one-by-one:", uploadedPath);
+      } else {
       // --- STEP 1: POST /upload (Upload File) ---
       const fileToUpload = allFiles[currentFileIndex] || acceptedFiles[0];
-      let uploadedPath = null;
+//       let uploadedPath = null;
 
       const uploadFormData = new FormData();
       uploadFormData.append("files", fileToUpload, fileToUpload.name);
@@ -489,7 +501,7 @@ const handleSaveLength = async () => {
       const uploadData = await uploadResponse.json();
       uploadedPath = uploadData[0];
       console.log("Uploaded Path:", uploadedPath);
-
+}
       // --- STEP 2: POST /call/predict_3 (Start Processing) ---
       const callBody = {
         "data": [requestData] // This contains the updated scale params
@@ -607,6 +619,7 @@ const handleSaveLength = async () => {
           setIsEditing(false);
           setIsProcessed(true);
           console.log("Analysis results set successfully");
+          console.log(analysisResultsData);
         } else {
           console.warn("No valid analysis results data");
         }
@@ -617,7 +630,7 @@ const handleSaveLength = async () => {
 
       // Move to next file if in one-by-one mode
       if (processingMode === "one-by-one") {
-        setTimeout(goToNextFile, 1000);
+//         setTimeout(goToNextFile, 1000);
       }
     }
   } catch (error) {
@@ -702,18 +715,30 @@ const uploadImage = async () => {
   const baseURL = "https://aveen007-laserweld.hf.space";
   const apiEndpoint = "/call/predict_1";
 
-  // Get all files to upload
-  const filesToUpload = allFiles.length > 0 ? allFiles : acceptedFiles;
+  // Get files to upload based on processing mode
+  let filesToProcess = [];
 
-  if (!filesToUpload || filesToUpload.length === 0) {
+  if (processingMode === "one-by-one") {
+    // For one-by-one, only process the current file
+    const currentFile = allFiles[currentFileIndex];
+    if (currentFile) {
+      filesToProcess = [currentFile];
+    }
+  } else {
+    // For bulk or single file, process all files
+    filesToProcess = allFiles.length > 0 ? allFiles : acceptedFiles;
+  }
+
+  if (!filesToProcess || filesToProcess.length === 0) {
     console.error("Please select files first.");
     return;
   }
 
   const urls = [];
+  const newUploadedPaths = [...uploadedPaths];
 
   // Process each file individually
-  for (let file of filesToUpload) {
+  for (let file of filesToProcess) {
     let uploadedPath = null;
     let resultData = null;
 
@@ -735,7 +760,14 @@ const uploadImage = async () => {
       const uploadData = await uploadResponse.json();
       uploadedPath = uploadData[0]; // Get the first (and only) path
       console.log(`Uploaded Path for ${file.name}:`, uploadedPath);
-      uploadedPaths.push(uploadedPath);
+
+      // Store the uploaded path
+      if (processingMode === "one-by-one") {
+        newUploadedPaths[currentFileIndex] = uploadedPath;
+      } else {
+        newUploadedPaths.push(uploadedPath);
+      }
+
       // --- STEP 2: POST /call/predict_1 (Start Processing for single file) ---
       const callBody = {
         "data": [{ "path": uploadedPath }]
@@ -816,7 +848,7 @@ const uploadImage = async () => {
   // Set all collected results
   if (urls.length > 0) {
     setUploadedURL(urls);
-    setUploadedPaths(uploadedPaths);
+    setUploadedPaths(newUploadedPaths);
     console.log(`Successfully processed ${urls.length} files:`, urls);
 
     // If we have multiple files, show the first one
@@ -1122,7 +1154,7 @@ const logNavigation = (direction, newIndex) => {
     </button>
   </div>
 )}
-{csvData?.properties && (
+{csvData?.properties && isProcessed && (
   <div className="results-section">
     <div className="results-table-container">
       <table className="results-table">
@@ -1142,6 +1174,22 @@ const logNavigation = (direction, newIndex) => {
                 >
                   Download CSV
                 </button>
+                    {processingMode === "one-by-one" && allFiles.length > currentFileIndex + 1 && (
+                                    <button
+                                      onClick={goToNextFile}
+                                      className="next-image-btn"
+                                      style={{
+                                        background: '#28a745',
+                                        color: 'white',
+                                        padding: '10px 20px',
+                                        border: 'none',
+                                        borderRadius: '5px',
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      Process Next Image ({currentFileIndex + 2}/{allFiles.length})
+                                    </button>
+                                  )}
                   <button
                         onClick={handleStartOver}
                         className="start-over-btn"
