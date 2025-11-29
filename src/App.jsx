@@ -1125,40 +1125,41 @@ const logNavigation = (direction, newIndex) => {
       )}
 
 {processingMode === "bulk" && bulkResults.length > 0 && (
-  <div className="bulk-navigation">
+  <div className="bulk-navigation-arrows">
     <button
+      className="arrow-btn left-arrow"
       onClick={() => {
         const prevIndex = currentBulkIndex - 1;
-          logNavigation('back', prevIndex);
+        logNavigation('back', prevIndex);
         setCurrentBulkIndex(prevIndex);
         setDataURL(bulkResults[prevIndex].originalUrl);
-         setAnalysisResults({
-            images: [bulkResults[prevIndex]]
-          });
+        setAnalysisResults({
+          images: [bulkResults[prevIndex]]
+        });
       }}
       disabled={currentBulkIndex === 0}
     >
-      Previous
+      ‹
     </button>
 
-    <span>
+    <div className="image-counter">
       Image {currentBulkIndex + 1} of {bulkResults.length}
-    </span>
+    </div>
 
     <button
+      className="arrow-btn right-arrow"
       onClick={() => {
-
         const nextIndex = currentBulkIndex + 1;
-         logNavigation('forward', nextIndex);
+        logNavigation('forward', nextIndex);
         setCurrentBulkIndex(nextIndex);
         setDataURL(bulkResults[nextIndex].originalUrl);
-          setAnalysisResults({
-            images: [bulkResults[nextIndex]]
-          });
+        setAnalysisResults({
+          images: [bulkResults[nextIndex]]
+        });
       }}
       disabled={currentBulkIndex === bulkResults.length - 1}
     >
-      Next
+      ›
     </button>
   </div>
 )}
